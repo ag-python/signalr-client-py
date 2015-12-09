@@ -1,9 +1,8 @@
 import json
-import gevent
 from signalr.events import EventHook
 from signalr.hubs import Hub
 from signalr.transports import AutoTransport
-
+from threading import Thread
 
 class Connection:
     protocol_version = '1.5'
@@ -15,8 +14,9 @@ class Connection:
         self.connection_token = None
         self.connection_data = None
         self.handlers = EventHook()
+        self.is_open = False
         self.__transport = AutoTransport(session, self.handlers)
-        self.__greenlet = None
+        self.__listener_thread = None
 
     def __get_connection_data(self):
         return json.dumps(map(lambda hub_name: {'name': hub_name}, self.__hubs))
@@ -33,16 +33,19 @@ class Connection:
         listener = self.__transport.start(self)
 
         def wrapped_listener():
-            listener()
-            gevent.sleep(0)
+            while self.is_open:
+                listener()
 
-        self.__greenlet = gevent.spawn(wrapped_listener)
+        self.is_open = True
+        self.__listener_thread = Thread(target=wrapped_listener)
+        self.__listener_thread.start()
 
     def send(self, data):
         self.__transport.send(self, data)
 
     def close(self):
-        gevent.kill(self.__greenlet)
+        self.is_open = False
+        self.__listener_thread.join()
         self.__transport.close(self)
 
     def hub(self, name):

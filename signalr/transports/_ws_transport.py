@@ -53,7 +53,8 @@ class WebSocketsTransport(Transport):
     def __get_headers(self):
         headers = self._session.headers
         loader = WebSocketsTransport.HeadersLoader(headers)
-        self._session.auth(loader)
+        if self._session.auth:
+            self._session.auth(loader)
         return ['%s: %s' % (name, headers[name]) for name in headers]
 
     def __get_cookie_str(self):

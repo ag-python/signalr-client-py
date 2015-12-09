@@ -13,8 +13,6 @@ Install the following prerequisites using `pip`:
 
 Compatible with Python 2 and 3.
 
-For Python 3, you need to install a version of `gevent` >= 1.1.
-
 ## Usage
 
 ```

@@ -14,7 +14,7 @@ Install the following prerequisites using `pip`:
 Compatibility
 -------------
 
-Only compatible with Python 2, not Python 3.
+Compatible with Python 2 and 3.
 
 Usage
 -----

@@ -12,11 +12,17 @@ class ServerSentEventsTransport(Transport):
         return 'serverSentEvents'
 
     def start(self, connection):
-        self.__response = sseclient.SSEClient(self._get_url(connection, 'connect'), session=self._session)
+        connect_url = self._get_url(connection, 'connect')
+        self.__response = \
+            iter(sseclient.SSEClient(connect_url, session=self._session))
         self._session.get(self._get_url(connection, 'start'))
 
         def _receive():
-            for notification in self.__response:
+            try:
+                notification = next(self.__response)
+            except StopIteration:
+                return
+            else:
                 if notification.data != 'initialized':
                     self._handle_notification(notification.data)
 

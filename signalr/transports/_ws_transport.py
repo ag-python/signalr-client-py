@@ -31,9 +31,8 @@ class WebSocketsTransport(Transport):
                                     cookie=self.__get_cookie_str())
 
         def _receive():
-            while True:
-                notification = self.ws.recv()
-                self._handle_notification(notification)
+            notification = self.ws.recv()
+            self._handle_notification(notification)
 
         return _receive
 
